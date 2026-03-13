@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+<section class="bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6">
+
+    <h1 class="text-3xl font-bold text-slate-800 mb-6">
+        Historial de ventas
+    </h1>
+
+    <div class="overflow-x-auto">
+
+<form method="GET" action="{{ url_for('pizzas.historial') }}" class="mb-4 flex flex-wrap gap-2 items-center">
+
+
+    <input 
+        type="text" 
+        name="buscar" 
+        value="{{ buscar }}" 
+        placeholder="Buscar cliente..."
+        class="border rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+
+
+    <input 
+        type="date" 
+        name="fecha_inicio"
+        value="{{ fecha_inicio }}"
+        class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+
+    <input 
+        type="date" 
+        name="fecha_fin"
+        value="{{ fecha_fin }}"
+        class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+
+
+    <button 
+        type="submit" 
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg transition"
+    >
+        Buscar
+    </button>
+
+
+    <a 
+        href="{{ url_for('pizzas.historial') }}"
+        class="bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 py-2 rounded-lg transition"
+    >
+        Limpiar
+    </a>
+
+</form>
+
+        <table class="w-full border-collapse bg-white rounded-xl overflow-hidden">
+
+            <thead class="bg-slate-200">
+                <tr>
+                    <th class="p-3 text-left">Pedido</th>
+                    <th class="p-3 text-left">Cliente</th>
+                    <th class="p-3 text-left">Fecha</th>
+                    <th class="p-3 text-left">Total</th>
+                    <th class="p-3 text-left">Detalle</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for pedido, cliente in pedidos %}
+
+                <tr class="border-t">
+                    <td class="p-3">{{ pedido.id_pedido }}</td>
+                    <td class="p-3">{{ cliente.nombre }}</td>
+                    <td class="p-3">{{ pedido.fecha }}</td>
+                    <td class="p-3">${{ "%.2f"|format(pedido.total) }}</td>
+
+                    <td class="p-3">
+                        <a href="{{ url_for('pizzas.detalle_venta', id_pedido=pedido.id_pedido) }}"
+                            class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-3 rounded-lg">
+
+                            Ver
+
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

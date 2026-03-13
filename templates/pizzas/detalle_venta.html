@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block container %}
+
+<section class="bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6">
+
+<h1 class="text-3xl font-bold text-slate-800 mb-6">
+Detalle del pedido
+</h1>
+
+<div class="bg-white rounded-xl p-5 shadow mb-6">
+
+<p class="text-lg"><strong>Pedido:</strong> {{ pedido.id_pedido }}</p>
+<p class="text-lg"><strong>Cliente:</strong> {{ cliente.nombre }}</p>
+<p class="text-lg"><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+<p class="text-lg"><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+<p class="text-lg"><strong>Fecha:</strong> {{ pedido.fecha }}</p>
+<p class="text-xl font-bold mt-2">
+Total: ${{ "%.2f"|format(pedido.total) }}
+</p>
+
+</div>
+
+<div class="overflow-x-auto">
+
+<table class="w-full border-collapse bg-white rounded-xl overflow-hidden">
+
+<thead class="bg-slate-200">
+<tr>
+
+<th class="p-3 text-left">Tamaño</th>
+<th class="p-3 text-left">Ingredientes</th>
+<th class="p-3 text-left">Cantidad</th>
+<th class="p-3 text-left">Precio</th>
+<th class="p-3 text-left">Subtotal</th>
+
+</tr>
+</thead>
+
+<tbody>
+
+{% for detalle, pizza in detalles %}
+
+<tr class="border-t">
+
+<td class="p-3">{{ pizza.tamano }}</td>
+<td class="p-3">{{ pizza.ingredientes }}</td>
+<td class="p-3">{{ detalle.cantidad }}</td>
+<td class="p-3">${{ "%.2f"|format(pizza.precio) }}</td>
+<td class="p-3">${{ "%.2f"|format(detalle.subtotal) }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<a href="{{ url_for('pizzas.historial') }}"
+class="mt-6 inline-block bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-xl">
+
+← Volver al historial
+
+</a>
+
+</section>
+
+{% endblock %}
