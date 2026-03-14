@@ -1,40 +1,33 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "layout.html" %}
+{% block container %}
 
 <section class="bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6">
   <h1 class="text-3xl font-bold text-slate-800 mb-6">
     Sistema de pedidos de pizzas
   </h1>
 
-  <form
-    method="POST"
-    action="{{ url_for('pizzas.agregar') }}"
-    class="space-y-8"
-  >
+  <form method="POST" action="{{ url_for('pizzas.agregar') }}" class="space-y-8">
     {{ form.hidden_tag() }}
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div>
-        <label class="block font-semibold mb-2"
-          >{{ form.nombre.label.text }}</label
-        >
-        {{ form.nombre(class="w-full rounded-lg border border-slate-300 px-4
-        py-3") }}
+        <label class="block font-semibold mb-2">{{ form.nombre.label.text }}</label>
+        {{ form.nombre(class="w-full rounded-lg border border-slate-300 px-4 py-3") }}
       </div>
 
       <div>
-        <label class="block font-semibold mb-2"
-          >{{ form.direccion.label.text }}</label
-        >
-        {{ form.direccion(class="w-full rounded-lg border border-slate-300 px-4
-        py-3") }}
+        <label class="block font-semibold mb-2">{{ form.direccion.label.text }}</label>
+        {{ form.direccion(class="w-full rounded-lg border border-slate-300 px-4 py-3") }}
       </div>
 
       <div>
-        <label class="block font-semibold mb-2"
-          >{{ form.telefono.label.text }}</label
-        >
-        {{ form.telefono(class="w-full rounded-lg border border-slate-300 px-4
-        py-3") }}
+        <label class="block font-semibold mb-2">{{ form.telefono.label.text }}</label>
+        {{ form.telefono(class="w-full rounded-lg border border-slate-300 px-4 py-3") }}
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">{{ form.fecha.label.text }}</label>
+        {{ form.fecha(class="w-full rounded-lg border border-slate-300 px-4 py-3") }}
       </div>
     </div>
 
@@ -65,16 +58,11 @@
 
       <div class="bg-sky-100 border border-sky-400 rounded-2xl p-5">
         <h3 class="text-2xl font-bold text-slate-800 mb-4">Pedido</h3>
-        <label class="block font-semibold mb-2"
-          >{{ form.cantidad.label.text }}</label
-        >
-        {{ form.cantidad(class="w-full rounded-lg border border-slate-300 px-4
-        py-3 mb-4") }}
+        <label class="block font-semibold mb-2">{{ form.cantidad.label.text }}</label>
+        {{ form.cantidad(class="w-full rounded-lg border border-slate-300 px-4 py-3 mb-4") }}
 
-        <button
-          type="submit"
-          class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow"
-        >
+        <button type="submit"
+          class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow">
           Agregar
         </button>
       </div>
@@ -83,9 +71,7 @@
 </section>
 
 <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-  <div
-    class="lg:col-span-2 bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6"
-  >
+  <div class="lg:col-span-2 bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6">
     <h2 class="text-2xl font-bold text-slate-800 mb-4">Detalle del pedido</h2>
 
     <div class="overflow-x-auto">
@@ -96,6 +82,7 @@
             <th class="p-3 text-left">Ingredientes</th>
             <th class="p-3 text-left">Núm. Pizzas</th>
             <th class="p-3 text-left">Subtotal</th>
+            <th class="p-3 text-left">Acción</th>
           </tr>
         </thead>
         <tbody>
@@ -105,10 +92,19 @@
             <td class="p-3">{{ pizza.ingredientes }}</td>
             <td class="p-3">{{ pizza.cantidad }}</td>
             <td class="p-3">${{ pizza.subtotal }}</td>
+            <td class="p-3">
+              <form method="POST" action="{{ url_for('pizzas.quitar') }}">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="indice" value="{{ loop.index0 }}">
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                  Quitar
+                </button>
+              </form>
+            </td>
           </tr>
           {% else %}
           <tr>
-            <td colspan="4" class="p-4 text-center text-slate-500">
+            <td colspan="5" class="p-4 text-center text-slate-500">
               No hay productos en el pedido
             </td>
           </tr>
@@ -117,23 +113,10 @@
       </table>
     </div>
 
-    <div class="flex gap-4 mt-6">
-      <form method="POST" action="{{ url_for('pizzas.quitar') }}">
-        {{ form.hidden_tag() }}
-        <button
-          type="submit"
-          class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-xl"
-        >
-          Quitar
-        </button>
-      </form>
-
+    <div class="mt-6">
       <form method="POST" action="{{ url_for('pizzas.terminar') }}">
         {{ form.hidden_tag() }}
-        <button
-          type="submit"
-          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-xl"
-        >
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-xl">
           Terminar
         </button>
       </form>
@@ -142,27 +125,22 @@
 
   <div class="bg-sky-200 border-2 border-sky-300 rounded-xl shadow-md p-6">
     <h2 class="text-2xl font-bold text-slate-800 mb-4">Ventas del día</h2>
-<div class="bg-slate-200 rounded-xl p-6">
-<div class="max-h-40 overflow-y-auto space-y-3 pr-2">
-    {% for venta in ventas_dia %}
+    <div class="bg-slate-200 rounded-xl p-6">
+      <div class="max-h-40 overflow-y-auto space-y-3 pr-2">
+        {% for venta in ventas_dia %}
         <p class="text-xl font-semibold">
-            {{ venta.nombre }} total ${{ "%.2f"|format(venta.total) }}
+          {{ venta.nombre }} total ${{ "%.2f"|format(venta.total) }}
         </p>
-    {% else %}
+        {% else %}
         <p class="text-slate-600">No hay ventas registradas hoy.</p>
-    {% endfor %}
-</div>
+        {% endfor %}
+      </div>
 
-    <hr class="border-slate-400 my-4">
+      <hr class="border-slate-400 my-4">
 
-    <p class="text-3xl font-bold">
+      <p class="text-3xl font-bold">
         Ventas totales del día: ${{ "%.2f"|format(total_dia) }}
-    </p>
-
-</div>
-      <hr class="border-slate-400" />
-
-      <p class="text-3xl font-bold">Ventas totales del día: ${{ total_dia }}</p>
+      </p>
     </div>
   </div>
 </section>

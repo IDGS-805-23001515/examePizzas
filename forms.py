@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, RadioField, SelectMultipleField, IntegerField, widgets
 from wtforms.validators import DataRequired, NumberRange
+from wtforms.fields import DateField
+
 
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
@@ -20,6 +22,12 @@ class PizzaForm(FlaskForm):
         ],
         validators=[DataRequired()]
     )
+
+    fecha = DateField(
+    "Fecha del pedido",
+    format="%Y-%m-%d",
+    validators=[DataRequired()]
+)
 
     ingredientes = MultiCheckboxField(
         "Ingredientes",

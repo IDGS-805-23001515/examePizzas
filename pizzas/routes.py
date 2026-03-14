@@ -21,6 +21,7 @@ PRECIOS_INGREDIENTES = {
 
 
 
+
 @pizzas.route("/", methods=["GET"])
 @pizzas.route("/index", methods=["GET"])
 def index():
@@ -30,6 +31,13 @@ def index():
         session["detalle_pedido"] = []
 
     detalle_pedido = session["detalle_pedido"]
+
+    if detalle_pedido:
+        primer_item = detalle_pedido[0]
+        form.nombre.data = primer_item["nombre"]
+        form.direccion.data = primer_item["direccion"]
+        form.telefono.data = primer_item["telefono"]
+        form.fecha.data = datetime.strptime(primer_item["fecha"], "%Y-%m-%d").date()
 
     pedidos_hoy = Pedido.query.filter(Pedido.fecha == date.today()).all()
 
@@ -51,8 +59,6 @@ def index():
         total_dia=total_dia
     )
 
-
-
 @pizzas.route("/agregar", methods=["POST"])
 def agregar():
     form = PizzaForm()
@@ -67,6 +73,7 @@ def agregar():
     tamano = form.tamano.data
     ingredientes = form.ingredientes.data
     cantidad = form.cantidad.data
+    fecha = form.fecha.data
 
     precio_tamano = PRECIOS_TAMANO.get(tamano, 0)
     total_ingredientes = sum(PRECIOS_INGREDIENTES.get(i, 0) for i in ingredientes)
@@ -84,7 +91,8 @@ def agregar():
         "subtotal": subtotal,
         "nombre": form.nombre.data,
         "direccion": form.direccion.data,
-        "telefono": form.telefono.data
+        "telefono": form.telefono.data,
+        "fecha": str(fecha)
     })
 
     session["detalle_pedido"] = detalle_pedido
@@ -94,20 +102,20 @@ def agregar():
     return redirect(url_for("pizzas.index"))
 
 
-
 @pizzas.route("/quitar", methods=["POST"])
 def quitar():
+    indice = int(request.form.get("indice"))
+
     if "detalle_pedido" in session:
         detalle_pedido = session["detalle_pedido"]
 
-        if detalle_pedido:
-            detalle_pedido.pop()
+        if 0 <= indice < len(detalle_pedido):
+            detalle_pedido.pop(indice)
             session["detalle_pedido"] = detalle_pedido
             session.modified = True
-            flash("Última pizza eliminada.", "info")
+            flash("Pizza eliminada correctamente.", "info")
 
     return redirect(url_for("pizzas.index"))
-
 
 
 @pizzas.route("/terminar", methods=["POST"])
@@ -122,9 +130,14 @@ def terminar():
     nombre = primer_item["nombre"]
     direccion = primer_item["direccion"]
     telefono = primer_item["telefono"]
+    fecha_pedido = primer_item.get("fecha")
 
     if not nombre or not direccion or not telefono:
         flash("Faltan datos del cliente.", "danger")
+        return redirect(url_for("pizzas.index"))
+
+    if not fecha_pedido:
+        flash("Falta la fecha del pedido.", "danger")
         return redirect(url_for("pizzas.index"))
 
     try:
@@ -138,9 +151,11 @@ def terminar():
 
         total_pedido = sum(item["subtotal"] for item in detalle_pedido)
 
+        fecha_convertida = datetime.strptime(fecha_pedido, "%Y-%m-%d").date()
+
         pedido = Pedido(
             id_cliente=cliente.id_cliente,
-            fecha=date.today(),
+            fecha=fecha_convertida,
             total=total_pedido
         )
         db.session.add(pedido)
@@ -188,16 +203,16 @@ def historial():
         .join(Cliente, Pedido.id_cliente == Cliente.id_cliente)
     )
 
-    # Filtro por cliente
+
     if buscar:
         query = query.filter(Cliente.nombre.ilike(f"%{buscar}%"))
 
-    # Filtro por fecha inicio
+    
     if fecha_inicio:
         fecha_inicio_obj = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
         query = query.filter(Pedido.fecha >= fecha_inicio_obj)
 
-    # Filtro por fecha fin
+
     if fecha_fin:
         fecha_fin_obj = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
         query = query.filter(Pedido.fecha <= fecha_fin_obj)
